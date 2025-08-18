@@ -1,41 +1,11 @@
-const wordDictionary = {
-    "array": "A data structure that holds a collection of elements, accessible by index.",
-    "class": "A blueprint for creating objects in object-oriented programming.",
-    "input": "Data that is provided to a program by the user or another system.",
-    "logic": "A set of rules used to make decisions or control flow in a program.",
-    "model": "A representation of data or logic, often used in MVC architecture.",
-    "fetch": "A method for retrieving data, commonly used for making HTTP requests.",
-    "merge": "To combine multiple sources or branches of code or data into one.",
-    "stack": "A LIFO (Last-In-First-Out) data structure used in memory management and algorithms.",
-    "error": "An issue or bug that prevents code from running as expected.",
-    "token": "A piece of data representing authentication or lexical elements in parsing.",
-    "query": "A request to retrieve or manipulate data, usually from a database.",
-    "cache": "A temporary storage to speed up repeated access to data.",
-    "proxy": "An intermediary server or object that acts on behalf of another.",
-    "reset": "To return a system or variable back to its initial state.",
-    "trace": "To follow and examine the execution flow of a program, especially in debugging.",
-    "scope": "Defines where variables or functions are accessible in code.",
-    "shift": "An array operation that removes the first element.",
-    "click": "A common UI event triggered by mouse or pointer interaction.",
-    "style": "Defines the appearance of UI elements, usually with CSS.",
-    "value": "The data assigned to a variable or element.",
-    "media": "Refers to files like images, videos, or audio used in applications.",
-    "index": "A numerical representation of position in arrays or databases.",
-    "table": "A structured set of data organized in rows and columns.",
-    "flush": "To force writing of data from buffer to destination (like memory or disk).",
-    "route": "A path that maps URLs to specific code/functions in web frameworks.",
-    "click": "An event handler for user interface interaction, such as button presses.",
-    "cover": "Used in CSS or layouts to describe background scaling behavior.",
-    "hover": "A UI state triggered when a cursor is placed over an element.",
-    "block": "A container or grouping element in programming or layout systems.",
-    "focus": "An element’s active or selected state, especially for inputs."
-};
-
-
-
 const letters = document.querySelectorAll(".letter-box");
 const loadingDiv = document.querySelector(".loading");
 const brandName = document.querySelector(".brand-name");
+const resultPopup  = document.getElementById("result-popup");
+const resultText   = resultPopup?.querySelector(".result-text");
+const resultDef    = resultPopup?.querySelector(".result-def");
+const playAgainBtn = document.getElementById("play-again");
+
 const ANSWER_LENGTH = 5;
 let done = false;
 let isLoading = false;
@@ -44,12 +14,12 @@ let currentRow = 0;
 let remainingLife = 5;
 
 
-
 async function init() {
 
-    const today = getTodaysWord();
+    const today = await getTodaysWord();
     let CORRECT_WORD = today.word.toUpperCase();
-    let map = makeMap(CORRECT_WORD.toUpperCase());
+    let DEFINITION = today.definition;
+    let map = makeMap(CORRECT_WORD);
     console.log(CORRECT_WORD);
     console.log(today.definition);
 
@@ -58,7 +28,7 @@ async function init() {
         return;
     }
 
-    const inputLetter = event.target.textContent?.trim().toUpperCase();
+    let inputLetter = event.target.textContent?.trim().toUpperCase();
     if (!inputLetter) return;
 
     if (isLetter(inputLetter)) {
@@ -66,7 +36,7 @@ async function init() {
     }
     else if (inputLetter === "ENTER") {
         if (currentGuess.length === ANSWER_LENGTH) {
-            commit(CORRECT_WORD, map);
+            commit(CORRECT_WORD, map, today.definition);
         }
     }
     else if (inputLetter === "⌫") {
@@ -91,7 +61,7 @@ async function init() {
         else if (inputLetter === "ENTER") {
 
             if (currentGuess.length === ANSWER_LENGTH) {
-                commit(CORRECT_WORD, map);
+                commit(CORRECT_WORD, map, today.definition);
             }
 
 
@@ -108,7 +78,7 @@ async function init() {
         document.querySelector(".hint-button").addEventListener("click", () => {
         const popup = document.querySelector(".hint-popup");
         const hintText = document.querySelector(".hint-text");
-        hintText.textContent = today.definition;
+        hintText.textContent = DEFINITION;
         popup.classList.remove("hidden");
     });
 
@@ -132,7 +102,14 @@ async function init() {
         }, 300); // transition süresi kadar
     });
 
-    
+    if (playAgainBtn) {
+        playAgainBtn.addEventListener("click", () => {
+            window.location.reload(); // yeni kelime + reset
+        });
+    }
+
+
+
 };
 
 init();
@@ -172,21 +149,24 @@ init();
 
 
 
+async function getTodaysWord() {
+    const res = await fetch("/api/word");
+    const data = await res.json();
+    return {
+        word: data.word.toUpperCase(),
+        definition: data.definition
+    };
+    //TODO format kontrolü we try-catch eklenecek hata olursa getLocalWordFallback() fonksiyonu çağırılacak.
+}
 
-function getTodaysWord() {
-    const now = new Date();
-    const turkeyOffset = 3 * 60;
-    const turkeyDate = new Date(now.getTime() + turkeyOffset * 60000);
 
-    const startOfDay = new Date(Date.UTC(1970, 0, 1));
-    const daysSinceStart = Math.floor((turkeyDate - startOfDay) / (1000 * 60 * 60 * 24));
+function getLocalWordFallback() {
+    // TODO: localden kelime ve definition dönecek.
 
-    const keys = Object.keys(wordDictionary);
-    const index = daysSinceStart % keys.length;
-    const word = keys[index];
-    const definition = wordDictionary[word];
-
-    return { word, definition };
+    return {
+        word: "STACK",
+        definition: "A LIFO (Last-In-First-Out) data structure used in memory management and algorithms."
+    };
 }
 
 function isLetter(letter) {
@@ -220,9 +200,10 @@ async function validateWord(currentGuess) {
 
 
 
-async function commit(CORRECT_WORD, map) {
+async function commit(CORRECT_WORD, map, DEF_TEXT) {
 
     //TODO check commit function.
+
 
     loading(true);
     const response = await fetch("https://words.dev-apis.com/validate-word", {
@@ -283,12 +264,12 @@ async function commit(CORRECT_WORD, map) {
     }
     else if (currentGuess === CORRECT_WORD) {
 
-        winner();
+        winner(CORRECT_WORD, DEF_TEXT);
         done = true;
         return;
     }
     else if (currentGuess.length === ANSWER_LENGTH && currentGuess != CORRECT_WORD && remainingLife === 0 && isItValid) {
-        loser();
+        loser(CORRECT_WORD,DEF_TEXT);
         done = true;
         return;
     }
@@ -311,12 +292,29 @@ function loading(status) {
 
 }
 
-function winner() {
-    brandName.classList.add("winner");
+function winner(correctWord, definitionText) {
+    brandName?.classList.add("winner");
+    done = true;
+    if (resultText && resultDef && resultPopup) {
+        resultText.textContent = `Tebrikler! Kelime: ${correctWord}`;
+        resultDef.textContent  = `Anlam: ${definitionText}`;
+        resultPopup.classList.remove("hidden");
+    }
 }
 
-function loser() {
-    brandName.classList.add("loser");
+function loser(correctWord, definitionText) {
+    brandName?.classList.add("loser");
+    done = true;
+    if (resultText && resultDef && resultPopup) {
+        resultText.textContent = `Congratulations! Correct Word: ${capFirst(correctWord)}`; //TODO: capfirst çalışmıyor
+        resultDef.textContent  = `Meaning: ${definitionText}`;
+        resultPopup.classList.remove("hidden");
+    }
+}
+
+function capFirst(word) {
+    if (!word) return "";
+    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
 }
 
 

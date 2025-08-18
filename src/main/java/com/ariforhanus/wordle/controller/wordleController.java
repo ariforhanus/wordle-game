@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class wordleController {
 
     @GetMapping("/")
-    public String index() {
-        return "index";
+    public String game() {
+        return "game";
     }
 }
 

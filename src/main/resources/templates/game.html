@@ -63,8 +63,8 @@
             <div class="letter-box"></div>
             <div class="letter-box"></div>
             <div class="letter-box"></div>
-    </div>
     </section>
+    </div>
 
 <div class="hint-popup hidden">
   <div class="hint-content">
@@ -73,7 +73,18 @@
   </div>
 </div>
 
-<section class="keyboard-container">
+    <div class="hint-popup hidden" id="result-popup" role="dialog" aria-modal="true">
+        <div class="hint-content">
+            <p class="result-text"></p>
+            <p class="result-def" style="margin-top:8px;"></p>
+            <div style="margin-top:12px; display:flex; gap:8px; justify-content:center;">
+                <button class="hint-ok-button" id="play-again">Tekrar Oyna</button>
+            </div>
+        </div>
+    </div>
+
+
+    <section class="keyboard-container">
     <div class="hint-row">
         <button class="hint-button"><i class="fa-solid fa-lightbulb"></i></button>
     </div>
@@ -121,7 +132,7 @@
 
 
 
-     <script th:src="@{/js/script.js}"></script>
+     <script th:src="@{/js/script.js}" defer></script>
 </body>
 
 </html>

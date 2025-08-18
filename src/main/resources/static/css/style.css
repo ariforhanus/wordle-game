@@ -13,14 +13,13 @@
 }
 
 
-/* === RESET === */
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* === GÖVDE YAPISI === */
 html, body {
   width: 100%;
   min-height: 100dvh;
@@ -266,7 +265,7 @@ body {
   font-size: 1.2rem;
 }
 
-.hint-ok-button {
+.hint-ok-button, .btn{
   margin-top: 15px;
   padding: 10px 20px;
   font-weight: bold;
@@ -277,7 +276,7 @@ body {
   cursor: pointer;
 }
 
-.hint-ok-button:hover {
+.hint-ok-button:hover .btn:hover {
   background-color: #555;
 }
 
