@@ -1,6 +1,6 @@
-package com.ariforhanus.wordle.repo;
+package com.ariforhanus.wordle.repository;
 
-import com.ariforhanus.wordle.domain.User;
+import com.ariforhanus.wordle.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

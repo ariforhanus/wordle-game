@@ -1,4 +1,4 @@
-package com.ariforhanus.wordle.domain;
+package com.ariforhanus.wordle.entity;
 
 import jakarta.persistence.*;
 

@@ -1,7 +1,7 @@
 package com.ariforhanus.wordle.controller;
 
-import com.ariforhanus.wordle.domain.User;
-import com.ariforhanus.wordle.repo.UserRepository;
+import com.ariforhanus.wordle.entity.User;
+import com.ariforhanus.wordle.repository.UserRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;

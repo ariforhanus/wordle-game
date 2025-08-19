@@ -1,6 +1,6 @@
 package com.ariforhanus.wordle.service;
 
-import com.ariforhanus.wordle.repo.UserRepository;
+import com.ariforhanus.wordle.repository.UserRepository;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
 
