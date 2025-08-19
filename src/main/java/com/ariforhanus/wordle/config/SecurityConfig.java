@@ -35,11 +35,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/submit").permitAll()
                         .anyRequest().authenticated()
                 )
-//                .formLogin(login -> login
-//                        .loginPage("/auth/login").permitAll()
-//                        .defaultSuccessUrl("/", true)
-//                )
-//                .logout(logout -> logout.logoutUrl("/auth/logout").logoutSuccessUrl("/"))
+                .formLogin(login -> login
+                        .loginPage("/auth/login").permitAll()
+                        .defaultSuccessUrl("/", true)
+                )
+                .logout(logout -> logout.logoutUrl("/auth/logout").logoutSuccessUrl("/"))
                 .userDetailsService(uds);
         return http.build();
     }
