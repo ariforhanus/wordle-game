@@ -2,7 +2,6 @@ package com.ariforhanus.wordle.config;
 
 
 import com.ariforhanus.wordle.service.AppUserDetailsService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -11,10 +10,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final AppUserDetailsService uds;
+
+    public SecurityConfig(AppUserDetailsService uds) {
+        this.uds = uds;
+    }
 
     @Bean
     public PasswordEncoder PasswordEncoder() {

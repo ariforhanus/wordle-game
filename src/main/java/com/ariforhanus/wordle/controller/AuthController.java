@@ -1,9 +1,7 @@
 package com.ariforhanus.wordle.controller;
 
-
 import com.ariforhanus.wordle.domain.User;
 import com.ariforhanus.wordle.repo.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -14,12 +12,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-@RequiredArgsConstructor
 @RequestMapping("/auth")
 public class AuthController {
 
     private final UserRepository users;
     private final PasswordEncoder encoder;
+
+    public AuthController(UserRepository users, PasswordEncoder encoder) {
+        this.users = users;
+        this.encoder = encoder;
+    }
+
 
     @GetMapping("/login")
     public String loginPage(@RequestParam(required = false) String error, @RequestParam(required = false) String registered, Model m) {
@@ -60,12 +63,25 @@ public class AuthController {
             return "auth/register";
         }
 
-        var u = User.builder()
-                .username(username)
-                .email(email)
-                .passwordHash(encoder.encode(password))
-                .role("USER")
-                .build();
+        if(!password.equals(confirmPassword)){
+            m.addAttribute("error", "Şifreler eşleşmiyor");
+            return"auth/register";
+        }
+
+//        var u = User.builder()
+//                .username(username)
+//                .email(email)
+//                .passwordHash(encoder.encode(password))
+//                .role("USER")
+//                .build();
+
+        User u = new User();
+        u.setUsername(username);
+        u.setEmail(email);
+        u.setPasswordHash(encoder.encode(password));
+        u.setRole("USER");
+        users.save(u);
+
 
         try {
             users.save(u);
