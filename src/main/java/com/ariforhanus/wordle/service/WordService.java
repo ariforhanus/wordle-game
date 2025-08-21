@@ -19,9 +19,12 @@ public class WordService {
 
     public WordDto getWord(){
 
-        String word = "randomWord.getRandomFiveLetterWord()";
+//        String word = randomWord.getRandomFiveLetterWord();
 
-        String definitionText = "definition.getDefinition(word)";
+//        String definitionText = definition.getDefinition(word);
+
+        String word = "tests";
+      String definitionText = "test";
 
         return new WordDto(word, definitionText);
     }

@@ -7,11 +7,15 @@ const resultDef    = resultPopup?.querySelector(".result-def");
 const playAgainBtn = document.getElementById("play-again");
 
 const ANSWER_LENGTH = 5;
+const TOTAL_TRIES = 6;
 let done = false;
 let isLoading = false;
 let currentGuess = "";
 let currentRow = 0;
 let remainingLife = 5;
+let gameStartMs = Date.now();
+let scoreSent = false
+
 
 
 async function init() {
@@ -19,7 +23,6 @@ async function init() {
     const today = await getTodaysWord();
     let CORRECT_WORD = today.word.toUpperCase();
     let DEFINITION = today.definition;
-    let map = makeMap(CORRECT_WORD);
     console.log(CORRECT_WORD);
     console.log(today.definition);
 
@@ -36,7 +39,7 @@ async function init() {
     }
     else if (inputLetter === "ENTER") {
         if (currentGuess.length === ANSWER_LENGTH) {
-            commit(CORRECT_WORD, map, today.definition);
+            commit(CORRECT_WORD, today.definition);
         }
     }
     else if (inputLetter === "⌫") {
@@ -61,7 +64,7 @@ async function init() {
         else if (inputLetter === "ENTER") {
 
             if (currentGuess.length === ANSWER_LENGTH) {
-                commit(CORRECT_WORD, map, today.definition);
+                commit(CORRECT_WORD, today.definition);
             }
 
 
@@ -200,7 +203,7 @@ async function validateWord(currentGuess) {
 
 
 
-async function commit(CORRECT_WORD, map, DEF_TEXT) {
+async function commit(CORRECT_WORD, DEF_TEXT) {
 
     //TODO check commit function.
 
@@ -215,6 +218,8 @@ async function commit(CORRECT_WORD, map, DEF_TEXT) {
         )
     })
     loading(false);
+    
+    let map = makeMap(CORRECT_WORD);
     const responsedData = await response.json();
     const isItValid = responsedData.validWord;
     console.log(isItValid);
@@ -300,24 +305,69 @@ function winner(correctWord, definitionText) {
         resultDef.textContent  = `Anlam: ${definitionText}`;
         resultPopup.classList.remove("hidden");
     }
+
+    if(scoreSent) return;
+    scoreSent = true;
+
+    const username = "test"
+    const durationMs = Date.now() - gameStartMs;
+
+    const attempts = TOTAL_TRIES - remainingLife;
+    const word = correctWord;
+
+    sendScore({ username, attempts, durationMs, word}).then(resp=> console.log("Score Saved:", resp));
 }
 
 function loser(correctWord, definitionText) {
     brandName?.classList.add("loser");
     done = true;
     if (resultText && resultDef && resultPopup) {
-        resultText.textContent = `Congratulations! Correct Word: ${capFirst(correctWord)}`; //TODO: capfirst çalışmıyor
+        resultText.textContent = `Game Over! Correct Word: ${capFirst(correctWord)}`; //TODO: capfirst çalışmıyor
         resultDef.textContent  = `Meaning: ${definitionText}`;
         resultPopup.classList.remove("hidden");
     }
+}
+
+async function sendScore({username, attempts, durationMs, word}){
+    const token = getToken();
+    if(!token){
+        console.log("token yok.")
+        return;
+    }
+
+    try{
+        const res = await fetch("/api/scores", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer" + token
+            },
+            body: JSON.stringify({username, attempts, durationMs, word })
+        });
+
+        if(!res.ok){
+            const text = await res.text().catch(()=>"");
+            console.error("Score post failed: ", res.status, text);
+        }
+        return await res.json().catch(()=>({}));
+    }catch (err){
+        console.error("Score post error: ", err);
+        return null;
+    }
+}
+
+function saveToken(token){
+    try{localStorage.setItem("jwt", token);}catch(_) {}
+}
+
+function getToken(){
+    try{ return localStorage.getItem("jwt");} catch (_) {return null;}
 }
 
 function capFirst(word) {
     if (!word) return "";
     return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
 }
-
-
 
 
 function makeMap(array) {

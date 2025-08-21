@@ -20,16 +20,20 @@ public class ScoreService {
 
     private static final int BASE = 10_000;
     private static final int ATTEMPT_PENALTY = 1_000;
-    private static final int SECOND_PENALTY = 0;
+    private static final int SECOND_PENALTY = 7;
 
     public ScoreService(ScoreRepository repo){
         this.repo = repo;
     }
 
     public ScoreResponse save(ScoreRequest req) {
+        return saveFor(req.getUsername(), req);
+    }
+
+    public ScoreResponse saveFor(String username, ScoreRequest req) {
         int score = calcScore(req.getAttempts(), req.getDurationMs());
         Score s = new Score(
-                req.getUsername(),
+                username,
                 req.getAttempts(),
                 req.getDurationMs(),
                 score,

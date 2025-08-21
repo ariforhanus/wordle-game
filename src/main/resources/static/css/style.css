@@ -300,7 +300,7 @@ body {
   background-color: #d3d6da;
   border: none;
   padding: 12px;
-  min-width: 36px;
+  min-width: 48px;
   font-size: 1rem;
   margin: 2px;
   border-radius: 4px;
@@ -328,14 +328,17 @@ body {
   width: 18px;
 }
 
-.hidden-mobile {
-  display: none;
+
+
+@media(max-width: 768px){
+
+  .key{
+    min-width: 36px;
+  }
 }
 
 @media (max-width: 768px) {
-  .hidden-mobile {
-    display: block;
-  }
+  
   .letter-box {
     width: 50px;
     height: 50px;
